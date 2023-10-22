@@ -7,6 +7,8 @@ import com.example.restaurant.data.repository.RestaurantRepository
 import com.example.restaurant.di.AppComponent
 import com.example.restaurant.di.AuthorizationInterceptor
 import com.example.restaurant.di.NetworkComponent
+import com.example.restaurant.service.LocationService
+import com.example.restaurant.service.PermissionsService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -16,7 +18,11 @@ import java.util.concurrent.Executors
 
 class RestaurantApp: Application() {
     private lateinit var networkComponent: NetworkComponent
-    lateinit var appComponent: AppComponent
+
+    companion object {
+        lateinit var appComponent: AppComponent
+    }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -40,7 +46,9 @@ class RestaurantApp: Application() {
         )
         appComponent = AppComponent(
             restaurantRepository(),
-            Executors.newSingleThreadExecutor()
+            Executors.newSingleThreadExecutor(),
+            PermissionsService(),
+            LocationService(this)
         )
     }
 

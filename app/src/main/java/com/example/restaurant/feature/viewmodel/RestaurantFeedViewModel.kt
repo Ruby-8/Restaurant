@@ -10,16 +10,33 @@ import com.example.restaurant.feature.model.Restaurant
 import com.example.restaurant.feature.transformer.RestaurantTransformer
 import java.util.concurrent.ExecutorService
 
+private const val AUTOLOAD_THRESHOLD_PERCENTAGE = 0.8
 class RestaurantFeedViewModel(private val restaurantRepository: RestaurantRepository,
                               private val networkThreadPool: ExecutorService,
                               private val transformer: RestaurantTransformer = RestaurantTransformer()): ViewModel() {
 
     private val _restaurantList = MutableLiveData<List<Restaurant>>()
-    val restaurantList: LiveData<List<Restaurant>> = _restaurantList
-
+    private val _currentPosition = MutableLiveData(0)
     private val _restaurantFeedOffset: Int = 0
+    val restaurantList: LiveData<List<Restaurant>> = _restaurantList
+    val currentPosition: LiveData<Int> = _currentPosition
 
-    fun loadRestaurants(latitude: Float, longitude: Float, offset: Int = _restaurantFeedOffset) {
+    fun scrollToLeft() {
+        val current = _currentPosition.value ?: 0
+        if (current > 0) {
+            _currentPosition.postValue(current - 1)
+        }
+    }
+
+    fun scrollToRight() {
+        val maxLength = _restaurantList.value?.size ?: 0
+        val current = _currentPosition.value ?: 0
+        if (current < maxLength - 1) {
+            _currentPosition.postValue(current + 1)
+        }
+    }
+
+    fun loadRestaurants(latitude: Double, longitude: Double, offset: Int = _restaurantFeedOffset) {
         networkThreadPool.submit {
             val restaurants = restaurantRepository.getRestaurantList(latitude, longitude, _restaurantFeedOffset)
             var restaurantList = restaurants.data?.map { transformer.transform(it) } ?: emptyList()
@@ -30,6 +47,15 @@ class RestaurantFeedViewModel(private val restaurantRepository: RestaurantReposi
                 _restaurantList as List<Restaurant>
             }
             _restaurantList.postValue(restaurantList)
+        }
+    }
+
+    fun reloadIfNeeded(latitude: Double, longitude: Double) {
+        val current = currentPosition.value ?: 0
+        val total = _restaurantList.value?.size ?: 0
+
+        if (current >= total * AUTOLOAD_THRESHOLD_PERCENTAGE) {
+            loadRestaurants(latitude, longitude, total)
         }
     }
 

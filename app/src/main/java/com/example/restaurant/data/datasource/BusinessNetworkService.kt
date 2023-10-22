@@ -1,6 +1,7 @@
 package com.example.restaurant.data.datasource
 
-import com.example.restaurant.data.model.RestaurantBO
+import com.example.restaurant.data.model.Business
+import com.example.restaurant.data.model.BusinessList
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -11,13 +12,13 @@ interface BusinessNetworkService {
         @Query("term")
         term: String,
         @Query("latitude")
-        latitude: Float,
+        latitude: Double,
         @Query("longitude")
-        longitude: Float,
+        longitude: Double,
         @Query("offset")
         offset: Int,
         @Query("limit")
         limit: Int
-    ): Call<List<RestaurantBO>>
+    ): Call<BusinessList>
 
 }

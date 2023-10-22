@@ -1,19 +1,20 @@
 package com.example.restaurant.service
 
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-class PermissionsService(private val activity: AppCompatActivity) {
+class PermissionsService() {
 
-    fun hasPermissions(permissions: Array<String>): Boolean {
+    fun hasPermissions(activity: Context, permissions: Array<String>): Boolean {
         return permissions.all {
             ContextCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
-    fun requestPermissions(permissions: Array<String>, requestCode: Int) {
+    fun requestPermissions(activity: AppCompatActivity, permissions: Array<String>, requestCode: Int) {
         ActivityCompat.requestPermissions(activity, permissions, requestCode)
     }
 
