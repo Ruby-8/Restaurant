@@ -1,8 +1,8 @@
-package com.example.restaurant.data.backendmodel
+package com.example.restaurant.data.model
 
 import com.google.gson.annotations.SerializedName
 
-data class Restaurant(
+data class RestaurantBO(
     @SerializedName("id")
     val id: String,
     @SerializedName("name")

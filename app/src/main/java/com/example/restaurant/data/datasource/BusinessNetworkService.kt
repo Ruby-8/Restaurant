@@ -1,6 +1,6 @@
 package com.example.restaurant.data.datasource
 
-import com.example.restaurant.data.backendmodel.Restaurant
+import com.example.restaurant.data.model.RestaurantBO
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -18,6 +18,6 @@ interface BusinessNetworkService {
         offset: Int,
         @Query("limit")
         limit: Int
-    ): Call<List<Restaurant>>
+    ): Call<List<RestaurantBO>>
 
 }
