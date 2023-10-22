@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.Executors
 
 
 class RestaurantApp: Application() {
@@ -38,7 +39,8 @@ class RestaurantApp: Application() {
             retrofit
         )
         appComponent = AppComponent(
-            restaurantRepository()
+            restaurantRepository(),
+            Executors.newSingleThreadExecutor()
         )
     }
 
