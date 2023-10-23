@@ -64,9 +64,11 @@ class RestaurantFeedActivity: AppCompatActivity() {
             val leftBtn = findViewById<ImageButton>(R.id.btnLeft)
             val rightBtn = findViewById<ImageButton>(R.id.btnRight)
 
+            recyclerView.layoutManager = NonScrollableLinearLayoutManager(this)
+            recyclerView.adapter = RestaurantRecyclerViewAdapter()
+
             viewModel.restaurantList.observe(this) {
-                recyclerView.layoutManager = NonScrollableLinearLayoutManager(this)
-                recyclerView.adapter = RestaurantRecyclerViewAdapter(it)
+                (recyclerView.adapter as RestaurantRecyclerViewAdapter).updateRestaurants(it)
 
                 leftBtn.setOnClickListener {
                     viewModel.scrollToLeft()
@@ -78,11 +80,16 @@ class RestaurantFeedActivity: AppCompatActivity() {
             }
 
             viewModel.currentPosition.observe(this) {
-                recyclerView.scrollToPosition(it)
+                recyclerView.smoothScrollToPosition(it)
 
                 viewModel.reloadIfNeeded(location.latitude, location.longitude)
             }
-            viewModel.loadRestaurants(location.latitude, location.longitude, 0)
+
+            viewModel.restaurantList.value?.let {
+                if (it.isEmpty()) {
+                    viewModel.loadRestaurants(location.latitude, location.longitude, 0)
+                }
+            } ?: viewModel.loadRestaurants(location.latitude, location.longitude, 0)
         }
         appComponent.locationService.getCurrentLocation()
     }

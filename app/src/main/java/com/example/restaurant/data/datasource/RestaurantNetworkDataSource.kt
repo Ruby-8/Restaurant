@@ -6,7 +6,7 @@ import retrofit2.Call
 
 private const val RESTAURANT = "restaurant"
 class RestaurantNetworkDataSource(private val businessNetworkService: BusinessNetworkService) {
-    fun getRestaurantList(latitude: Double, longitude: Double, offset: Int = 0, limit: Int = 25): Call<BusinessList> {
+    fun getRestaurantList(latitude: Double, longitude: Double, offset: Int = 0, limit: Int = 10): Call<BusinessList> {
         return businessNetworkService.loadRestaurants(RESTAURANT, latitude, longitude, offset, limit)
     }
 }

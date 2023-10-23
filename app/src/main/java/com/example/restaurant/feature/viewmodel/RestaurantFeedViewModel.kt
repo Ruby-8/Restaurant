@@ -18,6 +18,7 @@ class RestaurantFeedViewModel(private val restaurantRepository: RestaurantReposi
     private val _restaurantList = MutableLiveData<List<Restaurant>>()
     private val _currentPosition = MutableLiveData(0)
     private val _restaurantFeedOffset: Int = 0
+    private var _isAutoLoadingFinished = false;
     val restaurantList: LiveData<List<Restaurant>> = _restaurantList
     val currentPosition: LiveData<Int> = _currentPosition
 
@@ -38,15 +39,15 @@ class RestaurantFeedViewModel(private val restaurantRepository: RestaurantReposi
 
     fun loadRestaurants(latitude: Double, longitude: Double, offset: Int = _restaurantFeedOffset) {
         networkThreadPool.submit {
-            val restaurants = restaurantRepository.getRestaurantList(latitude, longitude, _restaurantFeedOffset)
+            val restaurants = restaurantRepository.getRestaurantList(latitude, longitude, offset)
             var restaurantList = restaurants.data?.map { transformer.transform(it) } ?: emptyList()
             restaurantList = if (offset == 0) {
                 restaurantList
             } else {
-                _restaurantList.value?.toMutableList()?.addAll(restaurantList)
-                _restaurantList as List<Restaurant>
+                _restaurantList.value?.plus(restaurantList) as List<Restaurant>
             }
             _restaurantList.postValue(restaurantList)
+            _isAutoLoadingFinished = true
         }
     }
 
@@ -54,8 +55,9 @@ class RestaurantFeedViewModel(private val restaurantRepository: RestaurantReposi
         val current = currentPosition.value ?: 0
         val total = _restaurantList.value?.size ?: 0
 
-        if (current >= total * AUTOLOAD_THRESHOLD_PERCENTAGE) {
+        if (_isAutoLoadingFinished && current > total * AUTOLOAD_THRESHOLD_PERCENTAGE) {
             loadRestaurants(latitude, longitude, total)
+            _isAutoLoadingFinished = false
         }
     }
 
