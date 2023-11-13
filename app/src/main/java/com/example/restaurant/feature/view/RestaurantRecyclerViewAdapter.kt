@@ -28,7 +28,6 @@ class RestaurantRecyclerViewAdapter(private val restaurantList: MutableList<Rest
         val insertPoint = restaurantList.size
         restaurantList.clear()
         restaurantList.addAll(restaurants)
-        Log.v("isaac", "size = " + restaurantList.size)
         notifyItemInserted(insertPoint)
     }
 }
